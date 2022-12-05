@@ -12,17 +12,39 @@
     
     TVSMButtonViewController *buttonController = (TVSMButtonViewController*)[super contentViewController];
     [buttonController setStyle:2];
-    [self addTimer];
-    [buttonController setTitleText:uptimeText];
+    packageFile = [[self bundle] pathForResource:@"Uptime" ofType:@"png"];
+    theImage = [[UIImage imageWithContentsOfFile:packageFile] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [buttonController setImage:theImage];
+    [buttonController setTitleText:@"System Uptime"];
     return buttonController;
 }
 
 -(void)handleAction {
+    [self addTimer];
+   // call the main view controller of the application so we can push the alert to the main view.
+UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
+
+
+//then call the alert controller
+
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"System Uptime"
+                               message:uptimeText
+                               preferredStyle:UIAlertControllerStyleAlert];
+
+   UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+   handler:^(UIAlertAction * action) {
+
     [self removeTimer];
+
+
+    }];
+
+[alert addAction:ok];
+[vc presentViewController:alert animated:YES completion:nil];
 }
 
 -(BOOL)dismissAfterAction {
-    return TRUE;
+    return FALSE;
 }
 
 // code from @mtac8's uptime iOS tweak.
@@ -33,26 +55,8 @@
     [_uptimeTimer invalidate];
     _uptimeTimer = nil;
 }
--(void)setUptimeText {
-    time_t uptimeInterval = [self getDeviceUptime];
 
-    long seconds = uptimeInterval % 60;
-    long minutes = uptimeInterval / 60 % 60;
-    long hours = uptimeInterval / 60 / 60 % 24;
-    long days = uptimeInterval / 60 / 60 / 24;
 
-    uptimeText = [NSString stringWithFormat:@"System Uptime:\n"]; 
-    if (days != 0) {
-        uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%ldd ", days]];
-    }
-    if (hours != 0) {
-        uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%ldh ", hours]];
-    }
-    if (minutes != 0) {
-        uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%ldm ", minutes]];
-    }
-    uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%lds", seconds]];
-}
 -(time_t)getDeviceUptime {
     struct timeval boottime;
     int mib[2] = {CTL_KERN, KERN_BOOTTIME};
@@ -64,6 +68,27 @@
         uptimeInterval = now - boottime.tv_sec;
     }
     return uptimeInterval;
+}
+
+-(void)setUptimeText {
+    time_t uptimeInterval = [self getDeviceUptime];
+
+    long seconds = uptimeInterval % 60;
+    long minutes = uptimeInterval / 60 % 60;
+    long hours = uptimeInterval / 60 / 60 % 24;
+    long days = uptimeInterval / 60 / 60 / 24;
+
+    uptimeText = [NSString stringWithFormat:@"Current Uptime:\n"]; 
+    if (days != 0) {
+        uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%ldd ", days]];
+    }
+    if (hours != 0) {
+        uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%ldh ", hours]];
+    }
+    if (minutes != 0) {
+        uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%ldm ", minutes]];
+    }
+    uptimeText = [uptimeText stringByAppendingString:[NSString stringWithFormat:@"%lds", seconds]];
 }
 
 @end

@@ -10,6 +10,8 @@
 
 @interface UptimeTVModule : TVSMActionModule {
 	 NSString *uptimeText;
+	 NSString *packageFile;
+     UIImage *theImage;
 }
 
 +(long long)buttonStyle;
