@@ -1,8 +1,6 @@
 #import "UptimeTVModule.h"
 
-@implementation UptimeTVModule {
-     NSTimer *_uptimeTimer;
-}
+@implementation UptimeTVModule 
 
 +(long long)buttonStyle {
     return 2;
@@ -10,52 +8,40 @@
 
 -(id)contentViewController {
     
-    TVSMButtonViewController *buttonController = (TVSMButtonViewController*)[super contentViewController];
-    [buttonController setStyle:2];
+    self.buttonController = (TVSMButtonViewController*)[super contentViewController];
+    [self.buttonController setStyle:2];
     packageFile = [[self bundle] pathForResource:@"Uptime" ofType:@"png"];
     theImage = [[UIImage imageWithContentsOfFile:packageFile] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    [buttonController setImage:theImage];
-    [buttonController setTitleText:@"System Uptime"];
-    return buttonController;
+    [self.buttonController setImage:theImage];
+    [self.buttonController setTitleText:@"System Uptime"];
+    return self.buttonController;
 }
 
 -(void)handleAction {
-    [self addTimer];
-   // call the main view controller of the application so we can push the alert to the main view.
-UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
-
-
-//then call the alert controller
-
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"System Uptime"
-                               message:uptimeText
-                               preferredStyle:UIAlertControllerStyleAlert];
-
-   UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-   handler:^(UIAlertAction * action) {
-
-    [self removeTimer];
-
-
-    }];
-
-[alert addAction:ok];
-[vc presentViewController:alert animated:YES completion:nil];
+   [self setUptimeText];
+   [self showAlertToUser];
 }
 
 -(BOOL)dismissAfterAction {
     return FALSE;
 }
 
-// code from @mtac8's uptime iOS tweak.
- -(void)addTimer {
-    _uptimeTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(setUptimeText) userInfo:nil repeats:YES];
-}
--(void)removeTimer {
-    [_uptimeTimer invalidate];
-    _uptimeTimer = nil;
+
+-(void)showAlertToUser {
+    NSString *deviceName = [[UIDevice currentDevice] name];
+
+      UIAlertController *alert = [UIAlertController alertControllerWithTitle:deviceName
+                               message:uptimeText
+                               preferredStyle:UIAlertControllerStyleAlert];
+
+   UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+   handler:nil];
+
+[alert addAction:ok];
+[self.buttonController presentViewController:alert animated:YES completion:nil];
 }
 
+// code from @mtac8's uptime iOS tweak
 
 -(time_t)getDeviceUptime {
     struct timeval boottime;

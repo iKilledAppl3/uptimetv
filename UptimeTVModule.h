@@ -12,13 +12,13 @@
 	 NSString *uptimeText;
 	 NSString *packageFile;
      UIImage *theImage;
+     TVSMButtonViewController *_buttonController;
 }
-
+@property (retain, nonatomic) TVSMButtonViewController *buttonController;
 +(long long)buttonStyle;
 -(id)contentViewController;
 -(void)handleAction;
 -(BOOL)dismissAfterAction;
--(void)addTimer;
--(void)removeTimer;
+-(void)showAlertToUser;
 @end
 
